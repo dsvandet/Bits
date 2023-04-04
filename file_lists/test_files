@@ -1,0 +1,13 @@
+src/bits/arg_parse.test.cc
+src/bits/mem/bit_ref.test.cc
+src/bits/mem/fixed_cap_vector.test.cc
+src/bits/mem/monotonic_buffer.test.cc
+src/bits/mem/simd_bit_table.test.cc
+src/bits/mem/simd_bits.test.cc
+src/bits/mem/simd_bits_range_ref.test.cc
+src/bits/mem/simd_util.test.cc
+src/bits/mem/simd_word.test.cc
+src/bits/mem/sparse_xor_vec.test.cc
+src/bits/probability_util.test.cc
+src/bits/str_util.test.cc
+src/bits/test_util.test.cc

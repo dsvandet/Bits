@@ -1,0 +1,7 @@
+src/bits/benchmark_main.perf.cc
+src/bits/benchmark_util.perf.cc
+src/bits/mem/simd_bit_table.perf.cc
+src/bits/mem/simd_bits.perf.cc
+src/bits/mem/simd_word.perf.cc
+src/bits/mem/sparse_xor_vec.perf.cc
+src/bits/probability_util.perf.cc
