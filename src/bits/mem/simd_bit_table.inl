@@ -19,6 +19,8 @@
 #include <cstring>
 #include <sstream>
 
+#include "bits/base.h"
+
 namespace bits {
 
 template <size_t W>
@@ -168,6 +170,74 @@ void simd_bit_table<W>::transpose_into(simd_bit_table<W> &out) const {
 
     exchange_low_indices(out);
 }
+
+template <size_t W>
+simd_bit_table<W> simd_bit_table<W>::from_halves(
+    const simd_bit_table &table_A,
+    size_t a_bits,
+    size_t b_bits,
+    Orientation orientation,
+    const simd_bit_table &table_B,
+    size_t c_bits,
+    size_t d_bits){
+
+    size_t height;
+    size_t width;
+
+    switch (orientation) {
+        case OnTop:
+            {
+                // [A]
+                // [B]
+                assert(table_A.num_major_bits_padded() >= a_bits && table_A.num_minor_bits_padded() >= c_bits);
+                assert(table_B.num_major_bits_padded() >= b_bits && table_B.num_minor_bits_padded() >= c_bits);
+                assert(b_bits == d_bits);
+
+                height = a_bits + c_bits;
+                width  = b_bits;
+
+                simd_bit_table<W> result(height, width);
+
+                for (size_t row = 0; row < a_bits; row++) {
+                    for (size_t col = 0; col < width; col++) {
+                        result[row][col] = table_A[row][col];
+                    }
+                }
+                for (size_t row = a_bits; row < height; row++) {
+                    for (size_t col = 0; col < width; col++) {
+                        result[row][col] = table_B[row - a_bits][col];
+                    }
+                }
+                return result;
+            }
+        case OnLeft:
+            {
+                // [A B]
+                assert(table_A.num_minor_bits_padded() >= a_bits && table_A.num_major_bits_padded() >= c_bits);
+                assert(table_B.num_minor_bits_padded() >= b_bits && table_B.num_major_bits_padded() >= c_bits);
+                assert(a_bits == c_bits);
+
+                height = a_bits;
+                width  = b_bits + d_bits;
+
+                simd_bit_table<W> result(height, width);
+
+                for (size_t row = 0; row < height; row++) {
+                    for (size_t col = 0; col < b_bits; col++) {
+                        result[row][col] = table_A[row][col];
+                    }
+                    for (size_t col = b_bits; col < width; col++) {
+                        result[row][col] = table_B[row][col - b_bits];
+                    }
+                }
+                return result;
+            }
+        default:
+            throw std::invalid_argument("Orientation must be one of OntTop or OnLeft.");
+    }
+}
+
+
 
 template <size_t W>
 simd_bit_table<W> simd_bit_table<W>::from_quadrants(

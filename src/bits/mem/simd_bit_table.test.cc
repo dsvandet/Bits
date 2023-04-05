@@ -55,6 +55,7 @@ TEST_EACH_WORD_SIZE_W(simd_bit_table, creation, {
         "....");
 
     ASSERT_EQ(simd_bit_table<W>::identity(2).str().substr(0, 5), "1....");
+    ASSERT_EQ(simd_bit_table<W>::lambda(2).str().substr(0, 5), ".1...");
     ASSERT_EQ(simd_bit_table<W>(0, 5).str(), "");
     ASSERT_EQ(simd_bit_table<W>(5, 0).str().substr(0, 3), "\n\n\n");
 
@@ -254,6 +255,31 @@ TEST_EACH_WORD_SIZE_W(simd_bit_table, from_quadrants, {
         "1.1.\n"
         "....\n"
         "1.1.");
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bit_table, from_halves, {
+    simd_bit_table<W> A(3,5);
+    A[1][0] = true;
+    A[2][0] = true;
+    A[2][1] = true;
+    A[2][2] = true;
+    auto B = bits::simd_bit_table<W>::identity(5);
+    auto C = bits::simd_bit_table<W>::identity(3);
+    ASSERT_EQ(
+        simd_bit_table<W>::from_halves(A, 3, 5, bits::OnTop, B, 8, 5).str(8,5),
+        ".....\n"
+        "1....\n"
+        "111..\n"
+        "1....\n"
+        ".1...\n"
+        "..1..\n"
+        "...1.\n"
+        "....1");
+    ASSERT_EQ(
+        simd_bit_table<W>::from_halves(A, 3, 5, bits::OnLeft, C, 3, 3).str(3,8),
+        ".....1..\n"
+        "1.....1.\n"
+        "111....1");
 })
 
 TEST(simd_bit_table, lg) {

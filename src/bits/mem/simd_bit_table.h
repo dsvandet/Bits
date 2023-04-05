@@ -22,8 +22,8 @@
 namespace bits {
 
 enum Orientation {
-    OnTop   = 0,
-    OnSide  = 1,
+    OnTop       = 0,
+    OnLeft      = 1
 };
 
 /// A 2d array of bit-packed booleans, padded and aligned to make simd operations more efficient.
@@ -53,10 +53,13 @@ struct simd_bit_table {
     /// Concatenates tables together to form a larger table.
     /// From halves
     static simd_bit_table from_halves(
-        size_t n,
-        const simd_bit_table &table_one,
-        const simd_bit_table &table_two,
-        Orientation orientation);
+        const simd_bit_table &table_A,
+        size_t a_bits,
+        size_t b_bits,
+        Orientation orientation,
+        const simd_bit_table &table_B,
+        size_t c_bits,
+        size_t d_bits);
     /// Concatenates tables together to form a larger table.
     /// From quadrants
     static simd_bit_table from_quadrants(
