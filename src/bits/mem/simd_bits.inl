@@ -200,4 +200,29 @@ size_t simd_bits<W>::popcnt() const {
     return simd_bits_range_ref<W>(*this).popcnt();
 }
 
+template <size_t W>
+size_t simd_bits<W>::popcnt(size_t num_bits) const {
+    return simd_bits_range_ref<W>(*this).popcnt(num_bits);
+}
+
+template <size_t W>
+size_t simd_bits<W>::lzcnt() const {
+    return simd_bits_range_ref<W>(*this).lzcnt();
+}
+
+template <size_t W>
+size_t simd_bits<W>::lzcnt(size_t num_bits) const {
+    return simd_bits_range_ref<W>(*this).lzcnt(num_bits);
+}
+
+template <size_t W>
+size_t simd_bits<W>::tzcnt() const {
+    return simd_bits_range_ref<W>(*this).tzcnt();
+}
+
+template <size_t W>
+size_t simd_bits<W>::tzcnt(size_t num_bits) const {
+    return simd_bits_range_ref<W>(*this).tzcnt(num_bits);
+}
+
 }

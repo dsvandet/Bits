@@ -11,14 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Original Files from Craig Gidney's Stim Package https://github.com/quantumlib/Stim
 
-#include "stim/test_util.test.h"
+#include "bits/test_util.test.h"
 
 #include <fstream>
 
-#include "stim/probability_util.h"
+#include "bits/probability_util.h"
 
-using namespace stim;
+using namespace bits;
 
 static bool shared_test_rng_initialized;
 static std::mt19937_64 shared_test_rng;

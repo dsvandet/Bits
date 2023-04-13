@@ -443,3 +443,25 @@ TEST(simd_util, popcnt64) {
         }
     }
 }
+
+TEST(simd_util, lzcnt64) {
+    uint64_t v;
+    std::uniform_int_distribution<uint64_t> dis;
+    for (size_t expected = 0; expected < 64; expected++) {
+        v = dis(SHARED_TEST_RNG()) >> expected;
+        v |= (1ULL << (63 - expected));
+        ASSERT_EQ(lzcnt64(v), expected);
+    }
+    ASSERT_EQ(lzcnt64(0), 64);
+}
+
+TEST(simd_util, tzcnt64) {
+    uint64_t v;
+    std::uniform_int_distribution<uint64_t> dis;
+    for (size_t expected = 0; expected < 64; expected++) {
+        v = dis(SHARED_TEST_RNG()) << expected;
+        v |= (1ULL << expected) ;
+        ASSERT_EQ(tzcnt64(v), expected);
+    }
+    ASSERT_EQ(tzcnt64(0), 64);
+}

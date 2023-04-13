@@ -99,12 +99,35 @@ struct simd_bits_range_ref {
 
     /// Inverts all bits in the referenced range.
     void invert_bits();
+
     /// Sets all bits in the referenced range to zero.
     void clear();
+
     /// Randomizes the bits in the referenced range, up to the given bit count. Leaves further bits unchanged.
     void randomize(size_t num_bits, std::mt19937_64 &rng);
+
     /// Returns the number of bits that are 1 in the bit range.
     size_t popcnt() const;
+
+    /// Returns the number of bits that are 1 in the bit range for the first num_bits bits. Assumes
+    /// that the first bit is at the begining of the first simd_word.
+    size_t popcnt(size_t num_bits) const;
+
+    /// Returns the number of leading zero bits (bits 0,1,2, ...) in the bit range. Assumes
+    /// that the first bit is at the begining of the first simd_word.
+    size_t lzcnt() const;
+
+    /// Returns the number of leading zero bits (bits 0,1,2, ...) in the bit range for the first num_bits. Assumes
+    /// that the first bit is at the begining of the first simd_word.
+    size_t lzcnt(size_t num_bits) const;  
+
+    /// Returns the number of trailing zero bits (bits ...,num_bits-2, num_bits-1) in the bit range.
+    size_t tzcnt() const;
+
+    /// Returns the number of trailing zero bits (bits ...,num_bits-2, num_bits-1) in the bit range for first 
+    /// the num_bits. Assumes that the first bit is at the begining of the first simd_word.
+    size_t tzcnt(size_t num_bits) const;
+
     /// Returns whether or not the two ranges have set bits in common.
     bool intersects(const simd_bits_range_ref other) const;
 

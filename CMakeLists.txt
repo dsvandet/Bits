@@ -95,14 +95,14 @@ endif()
 
 
 
-#enable_testing()
-#add_executable(bits_test ${SOURCE_FILES} ${TEST_FILES})
-#target_link_libraries(bits_test gtest gtest_main)
-#target_compile_options(bits_test PRIVATE -Wall -Wpedantic -fno-strict-aliasing -fsanitize=undefined -fsanitize=address ${MACHINE_FLAG})
-#target_link_options(bits_test PRIVATE -fsanitize=undefined -fsanitize=address -pthread)
-#add_executable(bits_test_o3 ${SOURCE_FILES} ${TEST_FILES})
-#target_link_libraries(bits_test_o3 gtest gtest_main)
-#target_compile_options(bits_test_o3 PRIVATE -O3 -Wall -Wpedantic -fno-strict-aliasing ${MACHINE_FLAG})
-#target_link_options(bits_test_o3 PRIVATE -pthread)
+enable_testing()
+add_executable(bits_test ${SOURCE_FILES} ${TEST_FILES})
+target_link_libraries(bits_test gtest gtest_main)
+target_compile_options(bits_test PRIVATE -Wall -Wpedantic -fno-strict-aliasing -fsanitize=undefined -fsanitize=address ${MACHINE_FLAG})
+target_link_options(bits_test PRIVATE -fsanitize=undefined -fsanitize=address -pthread)
+add_executable(bits_test_o3 ${SOURCE_FILES} ${TEST_FILES})
+target_link_libraries(bits_test_o3 gtest gtest_main)
+target_compile_options(bits_test_o3 PRIVATE -O3 -Wall -Wpedantic -fno-strict-aliasing ${MACHINE_FLAG})
+target_link_options(bits_test_o3 PRIVATE -pthread)
 
 

@@ -11,14 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// Original Files from Craig Gidney's Stim Package https://github.com/quantumlib/Stim
 
-#include "stim/str_util.h"
+#include "bits/str_util.h"
 
 #include "gtest/gtest.h"
 
-#include "stim/test_util.test.h"
+#include "bits/test_util.test.h"
 
-using namespace stim;
+using namespace bits;
 
 TEST(str_util, comma_sep) {
     std::vector<int> v{1, 2, 3};

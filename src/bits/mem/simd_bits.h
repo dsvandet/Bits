@@ -98,10 +98,18 @@ struct simd_bits {
     inline const simd_bits_range_ref<W> word_range_ref(size_t word_offset, size_t sub_num_simd_words) const {
         return simd_bits_range_ref<W>(ptr_simd + word_offset, sub_num_simd_words);
     }
-
     /// Returns the number of bits that are 1 in the bit range.
     size_t popcnt() const;
-
+    /// Returns the number of bits that are 1 in the bit range for the num_bits most significant bits.
+    size_t popcnt(size_t num_bits) const;
+    /// Returns the number of leading zero bits in the bit range.
+    size_t lzcnt() const;
+    /// Returns the number of leading zero bits in the bit range for the num_bits most significant bits.
+    size_t lzcnt(size_t num_bits) const;
+    /// Returns the number of trailing zero bits in the bit range.
+    size_t tzcnt() const;
+    /// Returns the number of trailing zero bits in the bit range for the num_bits most significant bits.
+    size_t tzcnt(size_t num_bits) const;
     /// Inverts all bits in the range.
     void invert_bits();
     /// Sets all bits in the range to zero.

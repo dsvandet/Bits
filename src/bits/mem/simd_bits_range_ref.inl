@@ -146,6 +146,115 @@ size_t simd_bits_range_ref<W>::popcnt() const {
 }
 
 template <size_t W>
+size_t simd_bits_range_ref<W>::popcnt(size_t num_bits) const {
+    size_t num_full_limbs64 = num_bits/(sizeof(uint64_t) * 8);
+    size_t rem = num_bits % (sizeof(uint64_t) * 8);
+
+    assert(num_full_limbs64 + ((rem != 0)&1) <= num_u64_padded());
+
+    auto end = u64 + num_full_limbs64;
+    size_t result = 0;
+
+    // Process the complete limbs
+    for (const uint64_t *p = u64; p != end; p++) 
+        result += popcnt64(*p);
+
+    // Handle the partial limb if one exists
+    if (rem > 0) {
+        // Zero out the extra trailing bits
+        result += popcnt64(*(end) & (0xffffffffffffffff >> (64-rem)));
+    }
+    return result; 
+}
+
+template <size_t W>
+size_t simd_bits_range_ref<W>::tzcnt() const {
+    auto end = u64 + num_u64_padded();
+    size_t result = 0;
+    for (const uint64_t *p = end - 1; p!= u64 - 1; p--) {
+        if (*p == 0)
+            result += 64;
+        else {
+            // Use lzcnt64 instead of tzcnt64 : assumes Little E.
+            result += lzcnt64(*p);
+            return result;
+        }
+    }
+    return result;
+}
+
+template <size_t W>
+size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
+    size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
+    size_t rem = num_bits % (sizeof(uint64_t)*8);
+
+    assert(num_full_limbs64 + ((rem != 0)&1) <= num_u64_padded());
+
+    auto end = u64 + num_full_limbs64;
+    size_t result = 0;
+
+    // Handle the partial limb if one eists
+    if (rem > 0) {
+        result += tzcnt64(*(end) | (1ULL << rem));
+    }
+
+    // Handle the full limbs
+    for (const uint64_t *p = end-1; p != u64 - 1; p--) {
+        if (*p == 0) 
+            result += 64;
+        else {
+            // Use lzcnt64 instead of tzcnt64 : assumes Little E.
+            result += lzcnt64(*p);
+            return result;
+        }
+    }
+    return result;
+}
+
+template <size_t W>
+size_t simd_bits_range_ref<W>::lzcnt() const {
+    auto end = u64 + num_u64_padded();
+    size_t result = 0;
+    for (const uint64_t *p = u64; p != end; p++) {
+        if (*p == 0)
+            result += 64;
+        else {
+            // Use tzcnt64 instead of lzcnt64 : assumes Little E.
+            result += tzcnt64(*p);
+            return result;
+        }
+    }
+    return result;
+}
+
+template <size_t W>
+size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
+    size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
+    size_t rem = num_bits % (sizeof(uint64_t)*8);
+
+    assert(num_full_limbs64 + ((rem != 0)&1) <= num_u64_padded());
+
+    auto end = u64 + num_full_limbs64;
+    size_t result = 0;
+
+    // Handle the full limbs
+    for (const uint64_t *p = u64; p != end; p++) {
+        if (*p == 0)
+            result += 64;
+        else {
+            // Use tzcnt64 instead of lzcnt64 : assumes Little E.
+            result += tzcnt64(*p);
+            return result;
+        }
+    }
+
+    // Handle any partial limb
+    if (rem > 0) 
+        result += tzcnt64(*(end) | (1ULL << rem));
+    return result;
+}
+
+template <size_t W>
 bool simd_bits_range_ref<W>::intersects(const simd_bits_range_ref<W> other) const {
     size_t n = std::min(num_u64_padded(), other.num_u64_padded());
     uint64_t v = 0;

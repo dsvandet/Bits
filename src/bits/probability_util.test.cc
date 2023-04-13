@@ -19,6 +19,8 @@
 #include "gtest/gtest.h"
 
 #include "bits/test_util.test.h"
+#include "bits/mem/simd_word.h"
+#include "bits/mem/simd_bits.h"
 
 using namespace bits;
 

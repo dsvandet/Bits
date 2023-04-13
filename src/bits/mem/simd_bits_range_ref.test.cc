@@ -20,6 +20,7 @@
 
 #include "bits/mem/simd_word.test.h"
 #include "bits/test_util.test.h"
+#include "bits/mem/simd_bits.h"
 
 using namespace bits;
 
@@ -250,6 +251,60 @@ TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, popcnt, {
     ASSERT_EQ(ref.popcnt(), 2);
     data.u64[8] = 0xFFFFFFFFFFFFFFFFULL;
     ASSERT_EQ(ref.popcnt(), 66);
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, popcntbits, {
+    simd_bits<W> data(1024);
+    simd_bits_range_ref<W> ref(data);
+    ASSERT_EQ(ref.popcnt(1024), 0);
+    data[101] = 1;
+    ASSERT_EQ(ref.popcnt(500), 1);
+    ASSERT_EQ(ref.popcnt(50), 0);
+    data[0] = 1;
+    ASSERT_EQ(ref.popcnt(50), 1);
+    data.u64[0] = 0xFFFFFFFFFFFFFFFFULL;
+    ASSERT_EQ(ref.popcnt(50), 50);
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, lzcnt, {
+    simd_bits<W> data(1024);
+    simd_bits_range_ref<W> ref(data);
+    ASSERT_EQ(ref.lzcnt(), 1024);
+    data[101] = 1;
+    ASSERT_EQ(ref.lzcnt(), 101);
+    data[2] = 1;
+    ASSERT_EQ(ref.lzcnt(), 2);
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, lzcntbits, {
+    simd_bits<W> data(1024);
+    simd_bits_range_ref<W> ref(data);
+    ASSERT_EQ(ref.lzcnt(50), 50);
+    data[101] = 1;
+    ASSERT_EQ(ref.lzcnt(128), 101);
+    ASSERT_EQ(ref.lzcnt(500), 101);
+    data[1023] = 1;
+    ASSERT_EQ(ref.lzcnt(1024), 101);
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, tzcnt, {
+    simd_bits<W> data(1024);
+    simd_bits_range_ref<W> ref(data);
+    ASSERT_EQ(ref.tzcnt(), 1024);
+    data[101] = 1;
+    ASSERT_EQ(ref.tzcnt(), 1023 - 102 + 1);
+    data[0] = 1;
+    ASSERT_EQ(ref.tzcnt(), 1023 - 102 + 1);
+})
+
+TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, tzcntbits, {
+    simd_bits<W> data(1024);
+    simd_bits_range_ref<W> ref(data);
+    ASSERT_EQ(ref.tzcnt(50), 50);
+    data[101] = 1;
+    ASSERT_EQ(ref.tzcnt(500), 499 - 102 + 1);
+    data[0] = 1;
+    ASSERT_EQ(ref.tzcnt(500), 499 - 102 + 1);
 })
 
 TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, intersects, {

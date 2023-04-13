@@ -20,6 +20,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <immintrin.h>
+
 namespace bits {
 
 constexpr uint64_t tile64_helper(uint64_t val, size_t shift) {
@@ -45,6 +47,14 @@ inline uint8_t popcnt64(uint64_t val) {
     val *= 0x101010101010101ULL;
     val >>= 56;
     return (uint8_t)val;
+}
+
+inline uint8_t tzcnt64(uint64_t val) {
+    return _tzcnt_u64(val);
+}
+
+inline uint8_t lzcnt64(uint64_t val) {
+    return _lzcnt_u64(val);
 }
 
 }  // namespace bits
