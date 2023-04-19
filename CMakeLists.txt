@@ -24,10 +24,12 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 endif()
 
 include_directories(src)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY out)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY out)
+
+# set(CMAKE_BUILD_TYPE Debug)
 
 include(FetchContent)
 FetchContent_Declare(

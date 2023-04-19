@@ -1,0 +1,37 @@
+Changes/Additions/Updates
+
+1. Change namespace from stim to bits
+2. Added new enum type `Orientation` with members `OnTop` and `OnLeft` to simd_bits_table.h
+3. Add function `from_halves(...)` to simd_bits_table.h/.cc Concatenates two tables together to form a larger table. 
+4. Add function `lambda(size_t n)` to simd_bits_table.h/.cc Creates a square table with 1's down the off diagonal
+5. Add function `tzcnt()` to simd_bits.h/.inl. Return the number of trailing zero bits in the bit range.
+6. Add function `tzcnt()` to simd_bits_range_ref.h./.cc. Returns the number of trailing zero bits
+    (bits ...,num_bits-2, num_bits-1) in the bit range.
+7. Add function `tzcnt64()` to sind_util.h. Returns the number of trailing zeros bits in a unit64_t.
+8. Add function `tzcnt(size_t num_bits)` to simd_bits.h/.inl. Return the number of trailing zero bits in the bit range for the
+    num_bits most significant bits.
+9. Add function `tzcnt(size_t num_bits)` to simd_bits_range_ref.h./.cc. Returns the number of trailing zero bits
+    (bits ...,num_bits-2, num_bits-1) in the bit range for first the num_bits. Assumes that the first bit is at the 
+    begining of the first simd_word.
+10. Add function `lzcnt()` to simd_bits.h/.inl. Returns the number of leading zero bits in the bit range.
+11. Add function `lzcnt()` to simd_bits_range_ref.h./.cc. Returns the number of leading zero bits (bits 0,1,2, ...) 
+    in the bit range. Assumes that the first bit is at the begining of the first simd_word.
+12. Add function `lzcnt64()` to sind_util.h Returns the number of leading zeros bits in a unit64_t.
+13. Add function `lzcnt(size_t num_bits)` to simd_bits.h/.inl. Returns the number of leading zero bits (bits 0,1,2, ...) 
+    in the bit range for the first num_bits. Assumes that the first bit is at the begining of the first simd_word.
+14. Add function `lzcnt(size_t num_bits)` to simd_bits_range_ref.h./.cc. Returns the number of leading zero bits in the bit
+    range for the num_bits most significant bits.
+15. Add function `lzcnt(size_t num_bits)`
+16. Add function `popcnt(size_t num_bits)` simd_bits.h/.inl. Returns the number of bits that are 1 in
+    the bit range for the num_bits most significant bits.
+17. Add function `popcnt(size_t num_bits)` to simd_bits_range_ref.h./.cc Returns the number of bits that are 1 in the bit range
+    for the first num_bits bits. Assumes that the first bit is at the begining of the first simd_word.
+18. Add test for `lzcnt64` to simd_utils.text.cc
+19. Add test for `tzcnt64` to simd_utils.text.cc
+20. Add test for `lzcnt` to simd_bits_range_ref.test.cc
+21. Add test for `tzcnt` to simd_bits_range_ref.test.cc
+22. Add #include "bits/mem/simd_bits.h" to simd_bits_range_ref.text.cc. No loading loading pauli_string.h which is where
+    is currently loads simd_bits.h
+23. Add #include "bits/mem/simd_word.h" to probability_util.test.cc. 
+24. Add #include "bits/mem/simd_bits.h" to probability_util.test.cc.
+
