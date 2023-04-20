@@ -51,7 +51,7 @@ class Matrix {
         /// Returns the bit at matrix[row][column] as a bool
         bool get(size_t row, size_t column) const;
         /// Returns a const bit reference for the bit at matrix[row][column] 
-        const bit_ref get_ref(size_t row, size_r column) const;
+        const bit_ref get_ref(size_t row, size_t column) const;
         /// Return a reference to the bit a matrix[row][column]
         bit_ref bit_ref get_ref(size_t row, size_r column);
         /// Sets the bit as matrix[row][column] as bool value

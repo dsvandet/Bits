@@ -5,7 +5,9 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include <bitset>
 
+#include "bits/macros.h"
 #include "bits/mem/simd_word.h"
 #include "bits/mem/simd_bits.h"
 #include "bits/algebra/vector_ref.h"
@@ -34,9 +36,11 @@ class Vector {
         explicit Vector(const VectorRef ref_vector);
 
         // Constructs a Vector from strings or chars
-        explicit Vector(const std::string value);
-        explicit Vector(const char* char_ptr);
+        Vector(const std::string str);
+        explicit Vector(const char* const str, size_t length);
 
+        // Returns a VectorRef to the given vectror
+        VectorRef ref();
 
         /// Returns the length of the vector (number of bits)
         /// size() is the primary defintion. All other methods call this.
@@ -47,6 +51,64 @@ class Vector {
         /// Returns a copy of the raw simd_bits
         simd_bits<MAX_BITWORD_WIDTH> get_simd_bits() const;
 
+        /// Returns bit_ref for the ith bit
+        bit_ref operator[](int_fast32_t index);
+
+        /// Returns a bool representing the ith bit 
+        const bool operator[](int_fast32_t index) const;
+        bool get(int index) const;
+
+        /// Set the bit to value at a given index
+        void set(int index, bool value);
+        
+        /// Toggle a given bit at the given index
+        void toggle(int index);
+
+        // Assignment operator
+        Vector& operator=(const Vector& rhs);
+
+        /// Comparision operators
+        /// Equality
+        bool operator==(const Vector& rhs) const;
+        /// Inequality
+        bool operator!= (const Vector& rhs) const;
+
+        /// GF2 addition of vectors
+        Vector operator+(const Vector& rhs);
+        Vector operator+=(const Vector& rhs);
+        Vector operator-(const Vector& rhs);
+        Vector operator-=(const Vector& rhs);
+        Vector operator^(const Vector& rhs);
+        Vector operator^=(const Vector& rhs);
+
+        Vector operator*(const Vector& rhs);
+        Vector operator*=(const Vector& rhs);
+        Vector operator&(const Vector& rhs);
+        Vector operator&=(const Vector& rhs);   
+
+        Vector operator|(const Vector& rhs);
+        Vector operator|=(const Vector& rhs);     
+
+        
+        // Right bit shift
+        Vector operator>>(int_fast32_t shift) const;
+        // Left bit shift
+        Vector operator<<(int_fast32_t shift) const;
+              
+
+        /*!
+        * Comparison < of two Vectors
+        * The comparison uses lexicographic order. One vector A is less than
+        * another B if it has fewer elements or if it has the same number of
+        * elements and the first unequal pair of elements satisfies A[i] < B[i]
+        */
+        bool Vector::operator< (const Vector &rhs) const;
+        bool Vector::operator> (const Vector &rhs) const;
+
+        friend std::ostream& operator<< (std::ostream& output,
+                                        const Vector& input);
+
+        
     
     private:
         size_t m_size_bits;
@@ -54,6 +116,8 @@ class Vector {
         simd_bits<MAX_BITWORD_WIDTH> m_simd_bits;
 
 };
+
+static bool isBitstring(const std::string& str);
 
 
 }
