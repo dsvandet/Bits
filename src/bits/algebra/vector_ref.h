@@ -22,14 +22,43 @@ class VectorRef {
         /// Constructors
 
         /// Constructs a reference vector to a given simd_bits_range_ref
-        VectorRef(const simd_bits_range_ref<MAX_BITWORD_WIDTH>& range_ref, size_t start_bit, size_t bit_length);
+        inline VectorRef(const simd_bits_range_ref<MAX_BITWORD_WIDTH> range_ref, size_t start_bit, size_t bit_length)
+            : m_start_bit_index(start_bit), m_size_bits(bit_length), m_simd_bits_range_ref(range_ref.ptr_simd, range_ref.num_simd_words) {}
+
+        /// Returns the starting index of the VectorRef
+        inline size_t start() const {
+            return this->m_start_bit_index;}
 
         /// Returns the length of vector (number of bits)
-        size_t size() const;
-        size_t length() const;
+        inline size_t size() const {
+            return this->m_size_bits;
+        }
+        inline size_t length() const {
+            return this->size();
+        }
 
         /// Returns the underlying simd_bits_range_ref member
-        simd_bits_range_ref<MAX_BITWORD_WIDTH> range_ref() const;
+        inline simd_bits_range_ref<MAX_BITWORD_WIDTH> range_ref() const {
+            return this->m_simd_bits_range_ref;
+        }
+
+        /// Returns a reference to a given bit within the referenced range.
+        inline bit_ref operator[](size_t k) {
+            return this->m_simd_bits_range_ref[k];
+        }
+        /// Returns a const reference to a given bit within the referenced range.
+        inline const bit_ref operator[](size_t k) const {
+            return this->m_simd_bits_range_ref[k];
+        }
+
+        friend std::ostream &operator<<(std::ostream &out, const VectorRef m);
+
+        /// Returns a description of the contents of the range.
+        inline std::string str() const {
+            std::stringstream ss;
+            ss << *this;
+            return ss.str();
+        }
 
     private:
         size_t m_start_bit_index;
@@ -39,6 +68,13 @@ class VectorRef {
 
 };
 
+/// Writes a description of the contents of the range to `out`.
+inline std::ostream &operator<<(std::ostream &out, const VectorRef m) {
+    for (size_t k = m.start(); k < m.start() + m.length(); k++) {
+        out << ".1"[m[k]];
+    }
+    return out;
+}
 
 }
 

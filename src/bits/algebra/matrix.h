@@ -31,46 +31,46 @@ class Matrix {
 
         // Operators
 
-        Matrix& operator=(const Matrix& rhs);
-        bool operator==(const Matrix& rhs);
-        Matrix operator+(const Matrix& rhs);
-        Matrix operator*(const Matrix& rhs);
-        Vector operator*(const Vector& rhs);
-        Vector operator*(const VectorRef& rhs);
+        // Matrix& operator=(const Matrix& rhs);
+        // bool operator==(const Matrix& rhs);
+        // Matrix operator+(const Matrix& rhs);
+        // Matrix operator*(const Matrix& rhs);
+        // Vector operator*(const Vector& rhs);
+        // Vector operator*(const VectorRef& rhs);
 
         /// Get and set methods
 
         /// Returns the number of rows of matrix (number of bots)
         size_t nrows() const;
-        size_t rows() const;
+        // size_t rows() const;
 
         /// Returns the number of columns of matrix (number of bots)
         size_t ncols() const;
-        size_t columns() const;
+        // size_t columns() const;
       
         /// Returns the bit at matrix[row][column] as a bool
-        bool get(size_t row, size_t column) const;
+        //bool get(size_t row, size_t column) const;
         /// Returns a const bit reference for the bit at matrix[row][column] 
-        const bit_ref get_ref(size_t row, size_t column) const;
+        //const bit_ref get_ref(size_t row, size_t column) const;
         /// Return a reference to the bit a matrix[row][column]
-        bit_ref bit_ref get_ref(size_t row, size_r column);
+        //bit_ref get_ref(size_t row, size_t column);
         /// Sets the bit as matrix[row][column] as bool value
-        void set(size_t row, size_t column, bool value);
+        //void set(size_t row, size_t column, bool value);
 
         /// Returns copy of the row matrix[row]
-        Vector get_row(size_t row) const;
+        //Vector get_row(size_t row) const;
         /// Returns a ref to the row matrix[row]
-        VectorRef get_row_ref(size_t row) const;
+        //VectorRef get_row_ref(size_t row) const;
 
         /// Sets the row'th row as row_vector
-        void set_row(size_t row, const Vector& row_vector);
+        // void set_row(size_t row, const Vector& row_vector);
 
         /// Returns a copy of the column indexed by column as a Vector
-        Vector get_column(size_t column) const;
+        //Vector get_column(size_t column) const;
 
         /// Sets the column of index column from Vector/VectorRef
-        void set_column(size_t column, const Vector& vector);
-        void set_column(size_t column, const VectorRef& vector_ref)
+        //void set_column(size_t column, const Vector& vector);
+        //void set_column(size_t column, const VectorRef& vector_ref)
 
 
         /// Returns a copy of the raw simd_bit_table

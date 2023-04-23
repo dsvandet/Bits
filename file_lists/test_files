@@ -11,3 +11,4 @@ src/bits/mem/sparse_xor_vec.test.cc
 src/bits/probability_util.test.cc
 src/bits/str_util.test.cc
 src/bits/test_util.test.cc
+src/bits/algebra/vector_test.cc

@@ -185,6 +185,7 @@ size_t simd_bits_range_ref<W>::tzcnt() const {
 
 template <size_t W>
 size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
+    std::cout << "tzcnt" << std::endl;
     size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
     size_t rem = num_bits % (sizeof(uint64_t)*8);
 
@@ -205,9 +206,11 @@ size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
         else {
             // Use lzcnt64 instead of tzcnt64 : assumes Little E.
             result += lzcnt64(*p);
+            std::cout << "result tz= " << result << std::endl;
             return result;
         }
     }
+    std::cout << "result tz= " << result << std::endl;
     return result;
 }
 
@@ -229,6 +232,7 @@ size_t simd_bits_range_ref<W>::lzcnt() const {
 
 template <size_t W>
 size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
+    std::cout << "lzcnt" << std::endl;
     size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
     size_t rem = num_bits % (sizeof(uint64_t)*8);
 
@@ -244,6 +248,7 @@ size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
         else {
             // Use tzcnt64 instead of lzcnt64 : assumes Little E.
             result += tzcnt64(*p);
+            std::cout << "result = lz" << result << std::endl;
             return result;
         }
     }
@@ -251,6 +256,7 @@ size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
     // Handle any partial limb
     if (rem > 0) 
         result += tzcnt64(*(end) | (1ULL << rem));
+    std::cout << "result lz= " << result << std::endl;
     return result;
 }
 

@@ -36,12 +36,26 @@ VectorRef Vector::ref() {
     return VectorRef(this->m_simd_bits, 0, this->m_size_bits);
 }
 
+Vector::operator VectorRef() {
+    return VectorRef(this->m_simd_bits, 0, this->m_size_bits);
+}
+
+Vector::operator const VectorRef() const{
+    return VectorRef(this->m_simd_bits, 0, this->m_size_bits);
+}
+
 size_t Vector::length() const {
     return this->size();
 }
 
 size_t Vector::size() const {
     return this->m_size_bits;
+}
+
+void Vector::randomize(size_t num_bits, std::mt19937_64 &rng) {
+    if (num_bits > this->m_size_bits) 
+        throw std::invalid_argument("The requested num_bits to randomize is larger than the vector length");
+    this->m_simd_bits.randomize(num_bits, rng);
 }
 
 simd_bits<MAX_BITWORD_WIDTH> Vector::get_simd_bits() const {
@@ -61,9 +75,29 @@ const bool Vector::operator[](int_fast32_t index) const {
     return bool(this->m_simd_bits[index]);
 }
 
+bool Vector::get(int index) const {
+    if (index < 0 || index >= this->m_size_bits)
+        throw std::out_of_range("Vector index out of range"+std::to_string(index));
+    return bool(this->m_simd_bits[index]);
+}
+
+void Vector::set(size_t index, bool value) {
+    if (index < 0 || index >= this->m_size_bits)
+        throw std::out_of_range("Vector index out of range"+std::to_string(index));
+    this->m_simd_bits[index] = value;
+}
+
+void Vector::toggle(size_t index) {
+    if (this->m_simd_bits[index]) 
+        this->m_simd_bits[index] = false;
+    else
+        this->m_simd_bits[index] = true;
+}
+
 Vector& Vector::operator=(const Vector& rhs) {
-    Vector vector(rhs);
-    return vector;
+    this->m_size_bits = rhs.m_size_bits;
+    this->m_simd_bits = rhs.m_simd_bits;
+    return *this;
 }
 
 bool Vector::operator==(const Vector& rhs) const {
@@ -150,12 +184,8 @@ Vector Vector::operator&=(const Vector& rhs) {
     return *this;
 }
 
-// Note: This only works if those bits in the simd_bits that are not within the vectors
-// range are zero. If they may not be zero then extra work in necessary to make sure that 
-// non zero bits are not pushed on the vectors bitstring.
-Vector Vector::operator<<(int_fast32_t shift) const {
-    // I think it is pretty safe to predict that shift is almost always not zero.
-    if (__builtin_expect(shift != 0, 1))
+void Vector::shift_right(size_t shift) {
+    if (likely(shift != 0))
     {
         const size_t g_shift = shift / 64;
         const size_t l_shift = shift % 64; 
@@ -178,12 +208,28 @@ Vector Vector::operator<<(int_fast32_t shift) const {
         } 
         std::fill(limb + 0, limb + g_shift, 0ULL);
     }
+}
 
+Vector& Vector::operator>>=(int_fast32_t shift) {
+    if (likely(shift >= 0)) {
+        if (likely(shift < this->length())) {
+            this->shift_right(shift);
+            this->clear_padding();
+            return *this;
+        }
+        this->m_simd_bits.clear();
+        return *this;
+    }
+    throw std::invalid_argument("Negative shift values are not permitted");
 }
 
 Vector Vector::operator>>(int_fast32_t shift) const {
-    // I think it is pretty safe to predict that shift is almost always not zero.
-    if (__builtin_expect(shift != 0, 1))
+    return Vector(*this) >>= shift;
+}
+
+
+void Vector::shift_left(size_t shift) {
+    if (likely(shift != 0))
     {
         const size_t g_shift = shift / 64;
         const size_t l_shift = shift % 64;
@@ -205,11 +251,29 @@ Vector Vector::operator>>(int_fast32_t shift) const {
     }
 }
 
+Vector &Vector::operator<<=(int_fast32_t shift) {
+    if (likely(shift >= 0)) {
+        if (likely(shift < this->length())) {
+            this->shift_left(shift);
+            this->clear_padding();
+            return *this;
+        }
+        this->m_simd_bits.clear();
+        return *this;
+    }
+    throw std::invalid_argument("Negative shift values are not permitted");
+}
+
+Vector Vector::operator<<(int_fast32_t shift) const {
+    return Vector(*this) <<= shift;
+}
 
 bool Vector::operator< (const Vector &rhs) const {
-    int_fast8_t diff = SIGNUM(DIFF(this->m_size_bits, rhs.length())); 
-    // Check if the lengths of the vectors differ and if so return the correct result.
-    if (diff) return (bool)(diff - 1);
+    //        -1 if x < y                      True  if x < y
+    // diff =  0 if x = y   (bool)(diff -1) =  
+    //         1 if x > y                      False if x > y
+    int32_t diff = SIGNUM((int32_t)(DIFF(this->m_size_bits, rhs.length()))); 
+    if ((bool)diff) return (bool)(diff - 1);
 
     // Given vectors are the same length, so see if/where they are different
     int_fast32_t i = 0, ctz;
@@ -229,8 +293,38 @@ bool Vector::operator< (const Vector &rhs) const {
     return false;  // they are equal
 }
 
+void Vector::clear() {
+    this->m_simd_bits.clear();
+}
+
+void Vector::clear_padding() {
+    size_t major = this->m_simd_bits.num_u8_padded()/8;
+    size_t minor = this->m_simd_bits.num_u8_padded()%8;
+    if (this->m_simd_bits.num_u8_padded() > major)
+        memset(this->m_simd_bits.u8 + major, 0, this->m_simd_bits.num_u8_padded() - major);
+    if (minor > 0)
+        this->m_simd_bits.u8[major - 1] &= ((char)1 << (8 - minor));
+}
+
 bool Vector::operator> (const Vector &rhs) const {
     return (rhs < *this);
+}
+
+size_t Vector::popcnt() const {
+    return this->m_simd_bits.popcnt(this->m_size_bits);
+}
+
+size_t Vector::lzcnt() const {
+    return this->m_simd_bits.lzcnt(this->m_size_bits);
+}
+
+size_t Vector::tzcnt() const {
+    return this->m_simd_bits.tzcnt(this->m_size_bits);
+}
+
+
+std::string Vector::str() const {
+    return VectorRef(*this).str();
 }
 
 

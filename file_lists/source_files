@@ -4,3 +4,4 @@ src/bits/mem/bit_ref.cc
 src/bits/mem/simd_util.cc
 src/bits/mem/simd_word.cc
 src/bits/mem/sparse_xor_vec.cc
+src/bits/algebra/vector.cc

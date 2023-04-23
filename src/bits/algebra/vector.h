@@ -36,17 +36,21 @@ class Vector {
         explicit Vector(const VectorRef ref_vector);
 
         // Constructs a Vector from strings or chars
-        Vector(const std::string str);
+        explicit Vector(const std::string str);
         explicit Vector(const char* const str, size_t length);
 
-        // Returns a VectorRef to the given vectror
+        // Returns a VectorRef to the given vector
         VectorRef ref();
+        operator VectorRef();
+        operator const VectorRef() const;
 
         /// Returns the length of the vector (number of bits)
         /// size() is the primary defintion. All other methods call this.
         size_t size() const;
         size_t length() const;
 
+        /// Randomizes the contents of this simd_bits using the given random number generator, up to the given bit position.
+        void randomize(size_t num_bits, std::mt19937_64 &rng);
 
         /// Returns a copy of the raw simd_bits
         simd_bits<MAX_BITWORD_WIDTH> get_simd_bits() const;
@@ -59,10 +63,10 @@ class Vector {
         bool get(int index) const;
 
         /// Set the bit to value at a given index
-        void set(int index, bool value);
+        void set(size_t index, bool value);
         
         /// Toggle a given bit at the given index
-        void toggle(int index);
+        void toggle(size_t index);
 
         // Assignment operator
         Vector& operator=(const Vector& rhs);
@@ -91,10 +95,16 @@ class Vector {
 
         
         // Right bit shift
+        void shift_right(size_t shift);
+        Vector& operator>>=(int_fast32_t shift);
         Vector operator>>(int_fast32_t shift) const;
+        
+
         // Left bit shift
+        void shift_left(size_t shift); 
+        Vector& operator<<=(int_fast32_t shift);
         Vector operator<<(int_fast32_t shift) const;
-              
+          
 
         /*!
         * Comparison < of two Vectors
@@ -102,13 +112,26 @@ class Vector {
         * another B if it has fewer elements or if it has the same number of
         * elements and the first unequal pair of elements satisfies A[i] < B[i]
         */
-        bool Vector::operator< (const Vector &rhs) const;
-        bool Vector::operator> (const Vector &rhs) const;
+        bool operator< (const Vector &rhs) const;
+        bool operator> (const Vector &rhs) const;
+
+        /// Clear all bits to zero
+        void clear();
+
+        /// Clear the zeros of the simd_bits not included in the vector (ie. padding elements)
+        void clear_padding();
+
+        /// Returns the popcount for the vector.
+        size_t popcnt() const;
+        /// Returns the number of leading zero bits for the vector.
+        size_t lzcnt() const;
+        /// Returns the number of trailing zero bits for the vector.
+        size_t tzcnt() const;
 
         friend std::ostream& operator<< (std::ostream& output,
                                         const Vector& input);
 
-        
+        std::string str() const;
     
     private:
         size_t m_size_bits;
@@ -116,8 +139,6 @@ class Vector {
         simd_bits<MAX_BITWORD_WIDTH> m_simd_bits;
 
 };
-
-static bool isBitstring(const std::string& str);
 
 
 }
