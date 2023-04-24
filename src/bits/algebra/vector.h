@@ -65,8 +65,8 @@ class Vector {
         /// Set the bit to value at a given index
         void set(size_t index, bool value);
         
-        /// Toggle a given bit at the given index
-        void toggle(size_t index);
+        /// Flip a given bit at the given index
+        void flip(size_t index);
 
         // Assignment operator
         Vector& operator=(const Vector& rhs);
@@ -130,7 +130,7 @@ class Vector {
 
         friend std::ostream& operator<< (std::ostream& output,
                                         const Vector& input);
-
+        /// Prints the vector as a string
         std::string str() const;
     
     private:

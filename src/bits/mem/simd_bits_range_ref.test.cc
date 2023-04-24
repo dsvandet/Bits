@@ -277,14 +277,21 @@ TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, lzcnt, {
 })
 
 TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, lzcntbits, {
-    simd_bits<W> data(1024);
-    simd_bits_range_ref<W> ref(data);
-    ASSERT_EQ(ref.lzcnt(50), 50);
-    data[101] = 1;
-    ASSERT_EQ(ref.lzcnt(128), 101);
-    ASSERT_EQ(ref.lzcnt(500), 101);
-    data[1023] = 1;
-    ASSERT_EQ(ref.lzcnt(1024), 101);
+    simd_bits<W> data_one(1024);
+    simd_bits_range_ref<W> ref_one(data_one);
+    ASSERT_EQ(ref_one.lzcnt(), 1024);
+    data_one[101] = 1;
+    ASSERT_EQ(ref_one.lzcnt(), 101);
+    data_one[0] = 1;
+    ASSERT_EQ(ref_one.lzcnt(), 0);
+    for (size_t i = 0; i < 1056; i += 64) {
+        simd_bits<W> data_small(i+12);
+        simd_bits_range_ref<W> ref_small(data_small);
+        for (size_t j = (i+12)/2; j > -1; j -= 10) {
+            data_small[j] = 1;
+            EXPECT_EQ(ref_small.lzcnt(i+12), j);
+        }
+    }
 })
 
 TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, tzcnt, {
@@ -298,13 +305,21 @@ TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, tzcnt, {
 })
 
 TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, tzcntbits, {
-    simd_bits<W> data(1024);
-    simd_bits_range_ref<W> ref(data);
-    ASSERT_EQ(ref.tzcnt(50), 50);
-    data[101] = 1;
-    ASSERT_EQ(ref.tzcnt(500), 499 - 102 + 1);
-    data[0] = 1;
-    ASSERT_EQ(ref.tzcnt(500), 499 - 102 + 1);
+    simd_bits<W> data_one(550);
+    simd_bits_range_ref<W> ref_one(data_one);
+    ASSERT_EQ(ref_one.tzcnt(50), 50);
+    data_one[101] = 1;
+    ASSERT_EQ(ref_one.tzcnt(500), 500 - 101 - 1);
+    data_one[0] = 1;
+    ASSERT_EQ(ref_one.tzcnt(500), 500 - 101 - 1);
+    for (size_t i = 0; i < 129; i += 64) {
+        simd_bits<W> data_small(i+12);
+        simd_bits_range_ref<W> ref_small(data_small);
+        for (size_t j = 0; j < (i+12)/2; j += 10) {
+            data_small[j] = 1;
+            EXPECT_EQ(ref_small.tzcnt(i+12), i + 12 -j - 1);
+        }
+    }
 })
 
 TEST_EACH_WORD_SIZE_W(simd_bits_range_ref, intersects, {

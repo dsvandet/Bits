@@ -175,7 +175,6 @@ size_t simd_bits_range_ref<W>::tzcnt() const {
         if (*p == 0)
             result += 64;
         else {
-            // Use lzcnt64 instead of tzcnt64 : assumes Little E.
             result += lzcnt64(*p);
             return result;
         }
@@ -183,9 +182,9 @@ size_t simd_bits_range_ref<W>::tzcnt() const {
     return result;
 }
 
+
 template <size_t W>
 size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
-    std::cout << "tzcnt" << std::endl;
     size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
     size_t rem = num_bits % (sizeof(uint64_t)*8);
 
@@ -196,7 +195,10 @@ size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
 
     // Handle the partial limb if one eists
     if (rem > 0) {
-        result += tzcnt64(*(end) | (1ULL << rem));
+        result += lzcnt64(*(end) & ((1ULL << rem)-1)) + rem -  64;
+        if (result < rem) {
+            return result;
+        }
     }
 
     // Handle the full limbs
@@ -204,13 +206,10 @@ size_t simd_bits_range_ref<W>::tzcnt(size_t num_bits) const {
         if (*p == 0) 
             result += 64;
         else {
-            // Use lzcnt64 instead of tzcnt64 : assumes Little E.
             result += lzcnt64(*p);
-            std::cout << "result tz= " << result << std::endl;
             return result;
         }
     }
-    std::cout << "result tz= " << result << std::endl;
     return result;
 }
 
@@ -232,7 +231,6 @@ size_t simd_bits_range_ref<W>::lzcnt() const {
 
 template <size_t W>
 size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
-    std::cout << "lzcnt" << std::endl;
     size_t num_full_limbs64 = num_bits/(sizeof(uint64_t)*8);
     size_t rem = num_bits % (sizeof(uint64_t)*8);
 
@@ -248,15 +246,14 @@ size_t simd_bits_range_ref<W>::lzcnt(size_t num_bits) const {
         else {
             // Use tzcnt64 instead of lzcnt64 : assumes Little E.
             result += tzcnt64(*p);
-            std::cout << "result = lz" << result << std::endl;
             return result;
         }
     }
 
     // Handle any partial limb
-    if (rem > 0) 
+    if (rem > 0)  {
         result += tzcnt64(*(end) | (1ULL << rem));
-    std::cout << "result lz= " << result << std::endl;
+    }
     return result;
 }
 

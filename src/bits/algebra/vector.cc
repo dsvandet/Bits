@@ -87,7 +87,7 @@ void Vector::set(size_t index, bool value) {
     this->m_simd_bits[index] = value;
 }
 
-void Vector::toggle(size_t index) {
+void Vector::flip(size_t index) {
     if (this->m_simd_bits[index]) 
         this->m_simd_bits[index] = false;
     else
@@ -188,30 +188,31 @@ void Vector::shift_right(size_t shift) {
     if (likely(shift != 0))
     {
         const size_t g_shift = shift / 64;
-        const size_t l_shift = shift % 64; 
+        const size_t r_shift = shift % 64; 
 
         uint64_t* limb = this->m_simd_bits.u64;
         const uint64_t bound = this->m_simd_bits.num_u64_padded();
 
-        if (l_shift == 0)
+        if (r_shift == 0)
           for (size_t n = bound - 1; n >= g_shift; --n)
             limb[n] = limb[n - g_shift];
         else
         {
-            const size_t comp_l_shift = 64 - l_shift;
+            const size_t comp_r_shift = 64 - r_shift;
 
             for (size_t n = bound - 1; n > g_shift; --n)
-                limb[n] = ((limb[n - g_shift] << l_shift)
-                   | (limb[n - g_shift - 1] >> comp_l_shift));
+                limb[n] = ((limb[n - g_shift] << r_shift)
+                   | (limb[n - g_shift - 1] >> comp_r_shift));
 
-            limb[g_shift] = limb[0] << l_shift;
-        } 
-        std::fill(limb + 0, limb + g_shift, 0ULL);
+            limb[g_shift] = limb[0] << r_shift;
+        }
+        for (size_t i = 0; i < g_shift; ++i)
+            limb[i] = 0ULL;
     }
 }
 
 Vector& Vector::operator>>=(int_fast32_t shift) {
-    if (likely(shift >= 0)) {
+    if (likely(shift > 0)) {
         if (likely(shift < this->length())) {
             this->shift_right(shift);
             this->clear_padding();
@@ -219,7 +220,8 @@ Vector& Vector::operator>>=(int_fast32_t shift) {
         }
         this->m_simd_bits.clear();
         return *this;
-    }
+    } else if (shift == 0)
+        return *this;
     throw std::invalid_argument("Negative shift values are not permitted");
 }
 
@@ -247,12 +249,13 @@ void Vector::shift_left(size_t shift) {
                         | (limb[n + g_shift + 1] << comp_l_shift));
                 limb[comp_bound] = limb[bound-1] >> l_shift;
             }   
-        std::fill(limb + comp_bound + 1, limb + bound, 0ULL);
+        for (size_t i = comp_bound + 1; i < bound; ++i)
+            limb[i] = 0ULL;
     }
 }
 
 Vector &Vector::operator<<=(int_fast32_t shift) {
-    if (likely(shift >= 0)) {
+    if (likely(shift > 0)) {
         if (likely(shift < this->length())) {
             this->shift_left(shift);
             this->clear_padding();
@@ -260,7 +263,8 @@ Vector &Vector::operator<<=(int_fast32_t shift) {
         }
         this->m_simd_bits.clear();
         return *this;
-    }
+    } else if (shift == 0)
+        return *this;
     throw std::invalid_argument("Negative shift values are not permitted");
 }
 
@@ -298,12 +302,15 @@ void Vector::clear() {
 }
 
 void Vector::clear_padding() {
-    size_t major = this->m_simd_bits.num_u8_padded()/8;
-    size_t minor = this->m_simd_bits.num_u8_padded()%8;
-    if (this->m_simd_bits.num_u8_padded() > major)
-        memset(this->m_simd_bits.u8 + major, 0, this->m_simd_bits.num_u8_padded() - major);
+    size_t major = this->m_size_bits/8;
+    size_t minor = this->m_size_bits%8;
+    size_t num_u8 = major + ((minor != 0)&1);
+
+    if (this->m_simd_bits.num_u8_padded() > num_u8)
+        memset(this->m_simd_bits.u8 + num_u8, (uint8_t)0, this->m_simd_bits.num_u8_padded() - num_u8);
+
     if (minor > 0)
-        this->m_simd_bits.u8[major - 1] &= ((char)1 << (8 - minor));
+        this->m_simd_bits.u8[major - 1] &= (((uint8_t)1 << minor)-1);
 }
 
 bool Vector::operator> (const Vector &rhs) const {
@@ -326,7 +333,6 @@ size_t Vector::tzcnt() const {
 std::string Vector::str() const {
     return VectorRef(*this).str();
 }
-
 
 std::ostream &operator<<(std::ostream &op_ostream, const Vector& rhs) {
   op_ostream << "[";

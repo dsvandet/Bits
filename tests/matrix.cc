@@ -1257,5 +1257,19 @@ int main(int argc, const char **argv) {
 
     std::cout << "Rank = " << rank << std::endl;
 
+    for (size_t i = 0; i < 65; i += 64) {
+        std::cout << "Testing vectors of length = " << i + 12 << std::endl;
+        bits::simd_bits<W> data_small(i+12);
+        bits::simd_bits_range_ref<W> ref_small(data_small);
+        for (size_t j = 0; j < (i+12)/2; j += 10) {
+            data_small[j] = 1;
+            std::cout << data_small.str() << std::endl;
+            std::cout << "Testing " << i + 12 << " vector with 1 in pos " << j << std::endl;
+            std::cout << "lzcnt(" << i+12 << ") = " << ref_small.lzcnt(i+12) << std::endl;
+            std::cout << "Expect = " << j << std::endl;
+            std::cout << ref_small.lzcnt(i+12) << " should equal " <<  j << std::endl;
+        }
+    }
+
     return 1;
 }
