@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <bitset>
 
 #include "bits/macros.h"
 #include "bits/mem/simd_word.h"
@@ -13,6 +12,8 @@
 #include "bits/algebra/vector_ref.h"
 
 namespace bits {
+
+class VectorRef;
 
 /// A Vector is a bit vector (vector over GF(2)). It is based on the simd_bits structure with
 /// added protections and methods that allow the user not to be converned with bit manipulations, 
@@ -25,6 +26,9 @@ class Vector {
         friend class VectorRef;
 
         /// Constructors
+
+        /// Constructs a 1 bit GF Vector
+        Vector(void);
 
         /// Constructs a size GF vector of zeros
         explicit Vector(size_t size);

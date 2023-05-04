@@ -11,6 +11,7 @@
 #include "bits/mem/simd_bit_table.h"
 #include "bits/mem/simd_util.h"
 #include "bits/mem/simd_bits_range_ref.h"
+#include "bits/mem/simd_bit_table_util.h"
 
 int main(int argc, const char **argv) {
     // create a test array ->identity
@@ -1078,28 +1079,75 @@ int main(int argc, const char **argv) {
 
 
     // Test matrix
-    auto S = bits::simd_bit_table<W>::identity(5);
-    S[0][3] = true;
-    S[1][0] = true;
-    S[2][1] = true;
-    S[2][3] = true;
-    S[3][1] = true;
-    S[3][4] = true;
+    // auto S = bits::simd_bit_table<W>::identity(5);
+    // S[0][3] = true;
+    // S[1][0] = true;
+    // S[2][1] = true;
+    // S[2][3] = true;
+    // S[3][1] = true;
+    // S[3][4] = true;
 
-    // std::cout << "Input matrix:" << std::endl << matrix.str(1024,2048) << std::endl;
 
-    // matrix = augment_mat(matrix, "right")
-    auto identity = bits::simd_bit_table<W>::identity(5);
-    auto matrix = bits::simd_bit_table<W>::from_halves(S,4,5,bits::OnLeft,identity,4,4);
-    // auto matrix = bits::simd_bit_table<W>::from_halves(matrix,1024,2048,bits::OnLeft,identity,1024,1024);
+    // std::cout << "Input matrix:" << std::endl;
+    // std::cout << S.str(4,5) << std::endl;
 
-    std::cout << "Augmented input matrix:" << std::endl << matrix.str(4,9) << std::endl;
+    // bits::RREF<W> rref = bits::rref_complete<W>(S, 4, 5);
+
+    // std::cout << "Heads" << std::endl << "[ ";
+    // for (auto element: rref.heads) {
+    //     std::cout << element << " ";
+    // }
+    // std::cout << "]" << std::endl << std::endl;
+
+    // std::cout << "RREF" << std::endl << rref.matrix.str(rref.rank, 5) << std::endl << std::endl;
+
+    // std::cout << "Transform" << std::endl << rref.transform.str(rref.rank, 4) << std::endl << std::endl;
+
+    // std::cout << "Rank = " << rref.rank << std::endl;
+
+    // Test matrix
+    auto B = bits::simd_bit_table<W>::from_text(R"TABLE(
+        ...1.
+        .1111
+        1111.
+        )TABLE");
+
+    std::cout << "Input matrix:" << std::endl;
+    std::cout << B.str(3,5) << std::endl;
+
+    bits::RREF<W> ref = bits::rref_complete<W>(B, 3, 5);
+
+    std::cout << "Heads" << std::endl << "[ ";
+    for (auto element: ref.heads) {
+        std::cout << element << " ";
+    }
+    std::cout << "]" << std::endl << std::endl;
+
+    std::cout << "RREF" << std::endl << ref.matrix.str(ref.rank, 5) << std::endl << std::endl;
+
+    std::cout << "Transform" << std::endl << ref.transform.str(ref.rank, 3) << std::endl << std::endl;
+
+    std::cout << "Rank = " << ref.rank << std::endl;
+
+    return 1;
+
+    //auto identity = bits::simd_bit_table<W>::identity(5);
+    //auto matrix = bits::simd_bit_table<W>::from_halves(S,4,5,bits::OnLeft,identity,4,4);
+
+    auto identity = bits::simd_bit_table<W>::identity(3);
+    std::cout << "Matrix: " << std::endl << B.str(3,5) << std::endl;
+
+    auto matrix = bits::simd_bit_table<W>::from_halves(B,3,5,bits::OnLeft,identity,3,3);
+
+    //std::cout << "Augmented input matrix:" << std::endl << matrix.str(4,9) << std::endl;
+
+    std::cout << "Augmented input matrix:" << std::endl << matrix.str(3,8) << std::endl;
 
     // nrows = matrix.shape[0]
     // ncols = matrix.shape[1]
     // hncols = ncols - nrows
-    size_t nrows = 4;
-    size_t ncols = 9;
+    size_t nrows = 3;
+    size_t ncols = 8;
     size_t hncols = ncols - nrows;
 
     // co_row = []
@@ -1256,20 +1304,6 @@ int main(int argc, const char **argv) {
     std::cout << "Transform" << std::endl << transform_mat.str(rnrows, nrows) << std::endl << std::endl;
 
     std::cout << "Rank = " << rank << std::endl;
-
-    for (size_t i = 0; i < 65; i += 64) {
-        std::cout << "Testing vectors of length = " << i + 12 << std::endl;
-        bits::simd_bits<W> data_small(i+12);
-        bits::simd_bits_range_ref<W> ref_small(data_small);
-        for (size_t j = 0; j < (i+12)/2; j += 10) {
-            data_small[j] = 1;
-            std::cout << data_small.str() << std::endl;
-            std::cout << "Testing " << i + 12 << " vector with 1 in pos " << j << std::endl;
-            std::cout << "lzcnt(" << i+12 << ") = " << ref_small.lzcnt(i+12) << std::endl;
-            std::cout << "Expect = " << j << std::endl;
-            std::cout << ref_small.lzcnt(i+12) << " should equal " <<  j << std::endl;
-        }
-    }
 
     return 1;
 }

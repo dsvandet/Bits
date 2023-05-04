@@ -4,6 +4,9 @@ using namespace bits;
 
 // Public methods
 
+Vector::Vector(void)
+    : m_size_bits(1), m_simd_bits(1) {}
+
 Vector::Vector(size_t size)
     : m_size_bits(size), m_simd_bits(size) {}
 

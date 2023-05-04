@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "bits/mem/simd_word.h"
+#include "bits/mem/simd_bits.h"
 #include "bits/mem/simd_bit_table.h"
 #include "bits/algebra/vector.h"
 
@@ -27,6 +28,29 @@ class Matrix {
 
         /// Constructs copy of a GF2 Matrix
         Matrix(const Matrix& in_matrix);
+
+        /// Constructs a Matrix from strings or chars
+        explicit Matrix(const std::string str);
+        explicit Matrix(const char* const str, size_t length);
+
+        /// Constructs a Matrix from simd_bits
+        explicit Matrix(simd_bits<MAX_BITWORD_WIDTH> &data, size_t nrows, size_t ncols);
+
+        /// Constructs a Matrux from simd_bit_table
+        explicit Matrix(simd_bit_table<MAX_BITWORD_WIDTH> &data, size_t nrows, size_t ncols);
+
+        /// Constucts a Matrix from a std::vector of std::vectors
+        template <typename T>
+        explicit Matrix(const std::vector<std::vector<T>> data);
+
+        /// Construct a Matrix from a std::vector
+        template <typename T>
+        explicit Matrix(const std::vector<T> data);
+
+        Matrix vector_vector_to_table(
+            std::vector<std::vector<bool>>& vector_matrix, 
+            size_t min_nrows, 
+            size_t min_ncols);
 
 
         // Operators

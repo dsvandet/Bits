@@ -4,11 +4,11 @@
 #include <cstdint>
 #include <iostream>
 
-#include "bits/algebra/vector.h"
 #include "bits/mem/simd_word.h"
 #include "bits/mem/simd_bits.h"
 
 namespace bits {
+
 
 /// A VectorRef is a bit vector reference. It is based on the simd_bits_range_ref structure with
 /// added protections and methods that allow the user not to be concerned with bit manipulations, 
@@ -25,10 +25,6 @@ class VectorRef {
         /// Constructs a reference vector to a given simd_bits_range_ref
         inline VectorRef(const simd_bits_range_ref<MAX_BITWORD_WIDTH> range_ref, size_t start_bit, size_t bit_length)
             : m_start_bit_index(start_bit), m_size_bits(bit_length), m_simd_bits_range_ref(range_ref.ptr_simd, range_ref.num_simd_words) {}
-
-        /// Constructs a reference vector to a given simd_bits_range_ref from a provided Vector
-        inline VectorRef(const Vector vector) :
-            m_start_bit_index(0), m_size_bits(vector.m_size_bits), m_simd_bits_range_ref(simd_bits_range_ref<MAX_BITWORD_WIDTH>(vector.m_simd_bits)) {} 
 
         /// Returns the starting index of the VectorRef
         inline size_t start() const {
